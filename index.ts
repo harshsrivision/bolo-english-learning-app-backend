@@ -552,3 +552,8 @@ void bootstrap().catch((error) => {
   console.error(message);
   process.exit(1);
 });
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
