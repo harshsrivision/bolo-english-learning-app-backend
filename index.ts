@@ -1,6 +1,7 @@
 ﻿import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { resolve } from "node:path";
 import { analyzeSentence, correctSentence } from "./ai";
 import { hashPassword, verifyPassword } from "./auth";
 import { conversationReply } from "./conversation";
@@ -9,14 +10,14 @@ import { lessons } from "./lessons";
 import { scorePronunciation } from "./pronunciation";
 import { apiRouter } from "./routes";
 
-dotenv.config();
+dotenv.config({ path: resolve(process.cwd(), ".env") });
 
-if (!process.env.API_PORT && process.env.PORT) {
-  process.env.API_PORT = process.env.PORT;
+if (!process.env.PORT && process.env.API_PORT) {
+  process.env.PORT = process.env.API_PORT;
 }
 
 const app = express();
-const PORT = process.env.API_PORT || 4000;
+const PORT = Number(process.env.PORT || 4000);
 
 function trimTrailingSlash(value: string) {
   return value.replace(/\/+$/, "");
@@ -622,5 +623,6 @@ void bootstrap().catch((error) => {
   console.error(message);
   process.exit(1);
 });
+
 
 

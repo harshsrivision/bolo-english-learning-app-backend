@@ -1,23 +1,31 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.ts",
+  "private": true,
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "ts-node index.ts"
+    "start": "node dist/index.js"
   },
   "dependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.5.0",
-    "@types/pg": "^8.11.6",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "openai": "^4.47.1",
     "pg": "^8.11.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.11.6",
+    "@types/sqlite3": "^3.1.11",
+    "typescript": "^5.9.3"
   }
 }
