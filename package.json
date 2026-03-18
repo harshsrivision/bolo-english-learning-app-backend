@@ -1,10 +1,10 @@
-﻿{
+{
   "name": "server",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "ts-node index.ts"
+    "start": "node index.js",
+    "build": "tsc"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
