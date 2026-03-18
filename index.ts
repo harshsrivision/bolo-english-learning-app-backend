@@ -1,4 +1,4 @@
-import cors from "cors";
+﻿import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { analyzeSentence, correctSentence } from "./ai";
@@ -11,11 +11,81 @@ import { apiRouter } from "./routes";
 
 dotenv.config();
 
-const app = express();
-const port = Number(process.env.API_PORT ?? 4000);
+if (!process.env.API_PORT && process.env.PORT) {
+  process.env.API_PORT = process.env.PORT;
+}
 
-app.use(cors());
+const app = express();
+const PORT = process.env.API_PORT || 4000;
+
+function trimTrailingSlash(value: string) {
+  return value.replace(/\/+$/, "");
+}
+
+const defaultAllowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://*.vercel.app",
+  "https://*.up.railway.app"
+];
+
+function parseClientOriginPatterns() {
+  const configuredOrigins = [process.env.CLIENT_ORIGINS ?? "", process.env.CLIENT_ORIGIN ?? "", process.env.FRONTEND_URL ?? "", process.env.NEXT_PUBLIC_APP_URL ?? ""]
+    .flatMap((value) => value.split(","))
+    .map((value) => trimTrailingSlash(value.trim()))
+    .filter(Boolean);
+
+  return Array.from(new Set([...defaultAllowedOrigins, ...configuredOrigins]));
+}
+
+function matchesOriginPattern(origin: string, pattern: string) {
+  if (origin === pattern) {
+    return true;
+  }
+
+  if (!pattern.includes("://*.")) {
+    return false;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    const patternUrl = new URL(pattern.replace("://*.", "://placeholder."));
+    const suffix = patternUrl.hostname.replace(/^placeholder\\./, "");
+
+    return originUrl.protocol === patternUrl.protocol && (originUrl.hostname === suffix || originUrl.hostname.endsWith("." + suffix));
+  } catch {
+    return false;
+  }
+}
+
+const allowedOriginPatterns = parseClientOriginPatterns();
+const corsOptions: cors.CorsOptions = {
+  origin(origin, callback) {
+    if (!origin || !allowedOriginPatterns.length) {
+      callback(null, true);
+      return;
+    }
+
+    const normalizedOrigin = trimTrailingSlash(origin);
+    const isAllowed = allowedOriginPatterns.some((pattern) => matchesOriginPattern(normalizedOrigin, pattern));
+
+    callback(null, isAllowed);
+  },
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", service: "bolo-english-api" });
+});
+
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", service: "bolo-english-api" });
+});
 
 type DailyProgressCounts = {
   sentences: number;
@@ -542,8 +612,8 @@ async function bootstrap() {
   app.post("/chat", handleConversation);
   app.use("/api", apiRouter);
 
-  app.listen(port, () => {
-    console.log(`Bolo English API listening on http://localhost:${port}`);
+  app.listen(PORT, () => {
+    console.log(`Bolo English API listening on port ${PORT}`);
   });
 }
 
@@ -552,8 +622,5 @@ void bootstrap().catch((error) => {
   console.error(message);
   process.exit(1);
 });
-const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+

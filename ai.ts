@@ -1,185 +1,120 @@
-import OpenAI from "openai";
-
-type SentenceAnalysis = {
-  corrected: string;
-  explanation: string;
-  tip: string;
-  pronunciationTip: string;
-  fluencyFeedback: string;
-};
-
-function normalizeSentence(sentence: string) {
-  const trimmedSentence = sentence.trim().replace(/\s+/g, " ");
-
-  if (!trimmedSentence) {
-    return "";
-  }
-
-  const correctedPronouns = trimmedSentence.replace(/\bi\b/g, "I");
-  const baseSentence = `${correctedPronouns[0].toUpperCase()}${correctedPronouns.slice(1)}`;
-
-  return /[.!?]$/.test(baseSentence) ? baseSentence : `${baseSentence}.`;
+﻿function normalizeWhitespace(text: string) {
+  return text.replace(/\s+/g, " ").trim();
 }
 
-function buildExplanation(sentence: string, correctedSentence: string) {
-  const notes: string[] = [];
-  const trimmedSentence = sentence.trim();
+function applyCommonCorrections(text: string) {
+  let corrected = normalizeWhitespace(text);
 
-  if (trimmedSentence !== trimmedSentence.replace(/\s+/g, " ")) {
-    notes.push("Extra spaces hata do taki sentence clean lage.");
+  const replacements: Array<[RegExp, string]> = [
+    [/\bi\b/g, "I"],
+    [/\bim\b/gi, "I'm"],
+    [/\bdont\b/gi, "don't"],
+    [/\bcant\b/gi, "can't"],
+    [/\bwont\b/gi, "won't"],
+    [/\bcan u\b/gi, "can you"],
+    [/\bpls\b/gi, "please"],
+    [/\benglish\b/g, "English"],
+    [/\bi am learn\b/gi, "I am learning"],
+    [/\bi am practice\b/gi, "I am practicing"]
+  ];
+
+  for (const [pattern, replacement] of replacements) {
+    corrected = corrected.replace(pattern, replacement);
   }
 
-  if (/\bi\b/.test(trimmedSentence) && !/\bI\b/.test(trimmedSentence)) {
-    notes.push("Pronoun 'I' ko hamesha capital likho.");
+  corrected = corrected.replace(/\s+([,.!?])/g, "$1");
+  corrected = corrected.replace(/(^|[.!?]\s+)([a-z])/g, (_match, prefix: string, letter: string) => `${prefix}${letter.toUpperCase()}`);
+
+  if (corrected && !/[.!?]$/.test(corrected)) {
+    corrected = `${corrected}.`;
   }
 
-  if (trimmedSentence && trimmedSentence[0] !== trimmedSentence[0]?.toUpperCase()) {
-    notes.push("Sentence ka first letter capital hona chahiye.");
-  }
-
-  if (trimmedSentence && !/[.!?]$/.test(trimmedSentence)) {
-    notes.push("Sentence ke end me punctuation add karo.");
-  }
-
-  if (!notes.length && correctedSentence === trimmedSentence) {
-    return "Sentence structure natural lag rahi hai. Subject aur verb ka flow sahi hai.";
-  }
-
-  if (!notes.length) {
-    return "Sentence mostly sahi tha. Maine usko thoda cleaner aur more natural banaya.";
-  }
-
-  return notes.join(" ");
+  return corrected;
 }
 
-function buildPronunciationTip(wordCount: number) {
-  if (wordCount <= 4) {
-    return "Har word ko clearly alag bolo aur last sound ko complete karo.";
-  }
-
-  if (wordCount <= 8) {
-    return "Important words par halka stress do aur do phrases ke beech short pause rakho.";
-  }
-
-  return "Sentence ko 2 ya 3 thought groups me bolo taki pronunciation aur clarity dono improve ho.";
+function getWordCount(text: string) {
+  return normalizeWhitespace(text)
+    .split(" ")
+    .filter(Boolean).length;
 }
 
-function buildFluencyFeedback(wordCount: number) {
-  if (wordCount <= 4) {
-    return "Response abhi short hai. Ek extra detail jodoge to fluency zyada natural lagegi.";
+function getExplanation(original: string, corrected: string) {
+  const changes: string[] = [];
+
+  if (original.trim() !== corrected.trim()) {
+    changes.push("capitalization, spacing, ya punctuation ko clean kiya gaya hai");
   }
 
-  if (wordCount <= 8) {
-    return "Length theek hai. Pace ko even rakho aur beech me unnecessary pause mat lo.";
+  if (/\benglish\b/i.test(original) && !/\bEnglish\b/.test(original)) {
+    changes.push("language name ko proper noun ki tarah capital letter diya gaya hai");
   }
 
-  return "Fluency achchi lag rahi hai. Ab ideas ko smoother transitions ke saath jodo.";
+  if (/\bdont\b|\bcant\b|\bwont\b/i.test(original)) {
+    changes.push("common short forms ko standard English contractions mein badla gaya hai");
+  }
+
+  if (!changes.length) {
+    return "Sentence overall samajhne layak tha. Maine bas usse thoda zyada natural aur polished English flow diya hai.";
+  }
+
+  return `Is sentence mein ${changes.join(", ")}. Isliye final version zyada natural aur readable lagta hai.`;
 }
 
-function buildImprovementTip(sentence: string, correctedSentence: string) {
-  if (correctedSentence !== sentence.trim()) {
-    return "Bolne se pehle sentence ko ek baar dimag me frame karo, phir slow aur clear pace me bolo.";
+function getPracticeTip(wordCount: number) {
+  if (wordCount < 6) {
+    return "Ek aur supporting sentence jodo taaki answer zyada complete lage.";
   }
 
-  return "Sentence sahi tha. Ab pronunciation aur rhythm par focus karo taki delivery zyada confident lage.";
+  if (wordCount < 14) {
+    return "Answer theek hai. Ab ek example ya reason add karke isse stronger banao.";
+  }
+
+  return "Structure achha hai. Ab pauses aur sentence stress ko control karke delivery aur strong karo.";
 }
 
-function buildLocalAnalysis(sentence: string): SentenceAnalysis {
-  const correctedSentence = normalizeSentence(sentence);
-  const wordCount = correctedSentence.split(/\s+/).filter(Boolean).length;
+function getPronunciationTip(text: string) {
+  if (/\b(think|this|that|the|thing|three)\b/i.test(text)) {
+    return "TH sound ke liye tongue ko halkasa teeth ke beech lao, phir soft air release karo.";
+  }
+
+  if (/\b(very|voice|view|love|leave)\b/i.test(text)) {
+    return "V sound ke liye lower lip ko upper teeth se lightly touch karao, phir voice nikalo.";
+  }
+
+  if (/\b(world|work|why|welcome|window)\b/i.test(text)) {
+    return "W sound ke liye lips ko round shape do. V aur W ko mix mat karo.";
+  }
+
+  return "Important nouns aur verbs par halka stress do, aur har phrase ke beech tiny pause lo.";
+}
+
+function getFluencyFeedback(text: string) {
+  const wordCount = getWordCount(text);
+
+  if (wordCount < 6) {
+    return "Response kaafi short hai. Confidence build karne ke liye do connected sentences bolne ki practice karo.";
+  }
+
+  if (wordCount < 14) {
+    return "Flow theek hai. Next step yeh hai ki answer ko start, detail, aur close ke simple structure mein do.";
+  }
+
+  return "Fluency achhi lag rahi hai. Ab speed ko stable rakho aur key ideas ko slightly stress karo.";
+}
+
+export function correctSentence(text: string) {
+  return applyCommonCorrections(text);
+}
+
+export function analyzeSentence(text: string) {
+  const corrected = correctSentence(text);
+  const wordCount = getWordCount(corrected);
 
   return {
-    corrected: correctedSentence,
-    explanation: buildExplanation(sentence, correctedSentence),
-    tip: buildImprovementTip(sentence, correctedSentence),
-    pronunciationTip: buildPronunciationTip(wordCount),
-    fluencyFeedback: buildFluencyFeedback(wordCount)
+    corrected,
+    explanation: getExplanation(text, corrected),
+    tip: getPracticeTip(wordCount),
+    pronunciationTip: getPronunciationTip(corrected),
+    fluencyFeedback: getFluencyFeedback(corrected)
   };
-}
-
-function getClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    return null;
-  }
-
-  return new OpenAI({ apiKey });
-}
-
-function parseJsonObject(text: string) {
-  const cleanedText = text.trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "");
-
-  try {
-    return JSON.parse(cleanedText) as Partial<SentenceAnalysis>;
-  } catch {
-    return null;
-  }
-}
-
-function isSentenceAnalysis(value: Partial<SentenceAnalysis> | null): value is SentenceAnalysis {
-  return Boolean(
-    value &&
-      typeof value.corrected === "string" &&
-      typeof value.explanation === "string" &&
-      typeof value.tip === "string" &&
-      typeof value.pronunciationTip === "string" &&
-      typeof value.fluencyFeedback === "string"
-  );
-}
-
-export async function correctSentence(sentence: string) {
-  const fallback = buildLocalAnalysis(sentence);
-  const client = getClient();
-
-  if (!client) {
-    return fallback.corrected;
-  }
-
-  try {
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: `Return only the corrected English sentence. If it is already correct, return it unchanged.\nSentence: ${sentence}`
-    });
-
-    return response.output_text.trim() || fallback.corrected;
-  } catch {
-    return fallback.corrected;
-  }
-}
-
-export async function analyzeSentence(sentence: string): Promise<SentenceAnalysis> {
-  const fallback = buildLocalAnalysis(sentence);
-  const client = getClient();
-
-  if (!client) {
-    return fallback;
-  }
-
-  try {
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: [
-        {
-          role: "system",
-          content:
-            "You are an English speaking coach for Hindi speakers. Return only valid JSON with keys corrected, explanation, tip, pronunciationTip, fluencyFeedback. corrected must be an English sentence. explanation, tip, pronunciationTip, fluencyFeedback should be short and simple Hindi or Hinglish."
-        },
-        {
-          role: "user",
-          content: `Analyze this spoken English sentence and return JSON only.\nSentence: ${sentence}`
-        }
-      ]
-    });
-
-    const parsed = parseJsonObject(response.output_text);
-
-    if (isSentenceAnalysis(parsed)) {
-      return parsed;
-    }
-  } catch {
-    return fallback;
-  }
-
-  return fallback;
 }
