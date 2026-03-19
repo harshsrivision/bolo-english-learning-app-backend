@@ -27,7 +27,8 @@ const defaultAllowedOrigins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://*.vercel.app",
-    "https://*.up.railway.app"
+    "https://*.up.railway.app",
+    "https://*.onrender.com"
 ];
 function parseClientOriginPatterns() {
     const configuredOrigins = [process.env.CLIENT_ORIGINS ?? "", process.env.CLIENT_ORIGIN ?? "", process.env.FRONTEND_URL ?? "", process.env.NEXT_PUBLIC_APP_URL ?? ""]

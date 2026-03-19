@@ -1,4 +1,4 @@
-﻿import cors from "cors";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { resolve } from "node:path";
@@ -27,7 +27,8 @@ const defaultAllowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "https://*.vercel.app",
-  "https://*.up.railway.app"
+  "https://*.up.railway.app",
+  "https://*.onrender.com"
 ];
 
 function parseClientOriginPatterns() {
@@ -623,6 +624,3 @@ void bootstrap().catch((error) => {
   console.error(message);
   process.exit(1);
 });
-
-
-
