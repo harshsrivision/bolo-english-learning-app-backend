@@ -6,6 +6,12 @@ import { analyzeSentence, correctSentence } from "./ai";
 import { hashPassword, verifyPassword } from "./auth";
 import { conversationReply } from "./conversation";
 import { initDB } from "./database";
+import {
+  ensureUserLessonsInitialized,
+  getLessonsForUser,
+  lessonExists,
+  saveLessonProgress
+} from "./lesson-progression";
 import { lessons } from "./lessons";
 import { scorePronunciation } from "./pronunciation";
 import { apiRouter } from "./routes";
@@ -60,6 +66,19 @@ function matchesOriginPattern(origin: string, pattern: string) {
   }
 }
 
+function isLocalDevelopmentOrigin(origin: string) {
+  try {
+    const originUrl = new URL(origin);
+
+    return (
+      (originUrl.protocol === "http:" || originUrl.protocol === "https:") &&
+      (originUrl.hostname === "localhost" || originUrl.hostname === "127.0.0.1" || originUrl.hostname === "[::1]")
+    );
+  } catch {
+    return false;
+  }
+}
+
 const allowedOriginPatterns = parseClientOriginPatterns();
 const corsOptions: cors.CorsOptions = {
   origin(origin, callback) {
@@ -69,7 +88,8 @@ const corsOptions: cors.CorsOptions = {
     }
 
     const normalizedOrigin = trimTrailingSlash(origin);
-    const isAllowed = allowedOriginPatterns.some((pattern) => matchesOriginPattern(normalizedOrigin, pattern));
+    const isAllowed =
+      isLocalDevelopmentOrigin(normalizedOrigin) || allowedOriginPatterns.some((pattern) => matchesOriginPattern(normalizedOrigin, pattern));
 
     callback(null, isAllowed);
   },
@@ -79,7 +99,7 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => {
   res.json({ status: "ok", service: "bolo-english-api" });
@@ -114,6 +134,21 @@ function parsePositiveInteger(value: unknown) {
 
 function parseNonNegativeInteger(value: unknown) {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
+}
+
+function isUniqueConstraintError(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const code = "code" in error && typeof error.code === "string" ? error.code : "";
+  const message = "message" in error && typeof error.message === "string" ? error.message : "";
+
+  return code === "23505" || /unique/i.test(message);
+}
+
+function isJsonSyntaxError(error: unknown) {
+  return error instanceof SyntaxError && "body" in error;
 }
 
 function toDayNumber(date: string) {
@@ -177,11 +212,60 @@ async function handleAnalyze(req: express.Request, res: express.Response) {
 async function bootstrap() {
   const db = await initDB();
 
+  async function queryOne<T>(sql: string, params: unknown[] = []) {
+    const result = await db.query(sql, params);
+    return result.rows[0] as T | undefined;
+  }
+
+  async function queryAll<T>(sql: string, params: unknown[] = []) {
+    const result = await db.query(sql, params);
+    return result.rows as T;
+  }
+
+  async function runQuery(sql: string, params: unknown[] = []) {
+    const result = await db.query(sql, params);
+    return {
+      lastID: ((result.rows[0] as { id?: number } | undefined)?.id ?? 0) as number,
+      changes: result.rowCount ?? 0
+    };
+  }
+
+  async function requireExistingUser(userId: number, res: express.Response) {
+    const user = await queryOne<{ id: number }>("SELECT id FROM users WHERE id = $1", [userId]);
+
+    if (user) {
+      return true;
+    }
+
+    res.status(404).json({ error: "User not found." });
+    return false;
+  }
+
+  function requireExistingLesson(lessonId: number, res: express.Response) {
+    if (lessonExists(lessonId)) {
+      return true;
+    }
+
+    res.status(404).json({ error: "Lesson not found." });
+    return false;
+  }
+
+  async function requireExistingVocabularyWord(wordId: number, res: express.Response) {
+    const word = await queryOne<{ id: number }>("SELECT id FROM vocabulary WHERE id = $1", [wordId]);
+
+    if (word) {
+      return true;
+    }
+
+    res.status(404).json({ error: "Vocabulary word not found." });
+    return false;
+  }
+
   async function getTodayDailyProgress(userId: number) {
-    return db.get<DailyProgressRow>(
+    return queryOne<DailyProgressRow>(
       `SELECT id, user_id, date, sentences_spoken, words_learned, lessons_completed
        FROM daily_progress
-       WHERE user_id = ? AND date = ?
+       WHERE user_id = $1 AND date = $2
        ORDER BY id DESC
        LIMIT 1`,
       [userId, getTodayDateKey()]
@@ -193,15 +277,15 @@ async function bootstrap() {
     const existingProgress = await getTodayDailyProgress(userId);
 
     if (existingProgress) {
-      await db.run(
+      await runQuery(
         `UPDATE daily_progress
-         SET sentences_spoken = ?, words_learned = ?, lessons_completed = ?
-         WHERE id = ?`,
+         SET sentences_spoken = $1, words_learned = $2, lessons_completed = $3
+         WHERE id = $4`,
         [counts.sentences, counts.words, counts.lessons, existingProgress.id]
       );
     } else {
-      await db.run(
-        "INSERT INTO daily_progress (user_id, date, sentences_spoken, words_learned, lessons_completed) VALUES (?, ?, ?, ?, ?)",
+      await runQuery(
+        "INSERT INTO daily_progress (user_id, date, sentences_spoken, words_learned, lessons_completed) VALUES ($1, $2, $3, $4, $5)",
         [userId, today, counts.sentences, counts.words, counts.lessons]
       );
     }
@@ -216,10 +300,10 @@ async function bootstrap() {
   }
 
   async function calculateCurrentStreak(userId: number) {
-    const activityRows = await db.all<{ date: string }[]>(
+    const activityRows = await queryAll<{ date: string }[]>(
       `SELECT DISTINCT date
        FROM daily_progress
-       WHERE user_id = ?
+       WHERE user_id = $1
          AND (sentences_spoken > 0 OR words_learned > 0 OR lessons_completed > 0)
        ORDER BY date DESC`,
       [userId]
@@ -262,7 +346,7 @@ async function bootstrap() {
 
   async function syncUserStreak(userId: number) {
     const streak = await calculateCurrentStreak(userId);
-    await db.run("UPDATE users SET streak = ? WHERE id = ?", [streak, userId]);
+    await runQuery("UPDATE users SET streak = $1 WHERE id = $2", [streak, userId]);
     return streak;
   }
 
@@ -302,9 +386,15 @@ async function bootstrap() {
 
   async function getDashboardSummary(userId: number) {
     const todayProgress = await getTodayDailyProgress(userId);
-    const totalLessonsCompleted = await db.get<{ count: number }>("SELECT COUNT(*) AS count FROM progress WHERE user_id = ?", [userId]);
-    const totalVocabularyLearned = await db.get<{ count: number }>(
-      "SELECT COUNT(DISTINCT word_id) AS count FROM vocabulary_progress WHERE user_id = ?",
+    const totalLessonsCompleted = await queryOne<{ count: number | string }>(
+      `SELECT COUNT(DISTINCT lesson) AS count
+       FROM progress
+       WHERE user_id = $1
+         AND (COALESCE(score, 0) >= 100 OR completed_at IS NOT NULL)`,
+      [userId]
+    );
+    const totalVocabularyLearned = await queryOne<{ count: number | string }>(
+      "SELECT COUNT(DISTINCT word_id) AS count FROM vocabulary_progress WHERE user_id = $1",
       [userId]
     );
     const currentStreak = await syncUserStreak(userId);
@@ -316,8 +406,8 @@ async function bootstrap() {
       words_learned: todayProgress?.words_learned ?? 0,
       lessons_completed: todayProgress?.lessons_completed ?? 0,
       current_streak: currentStreak,
-      total_lessons_completed: totalLessonsCompleted?.count ?? 0,
-      total_vocabulary_learned: totalVocabularyLearned?.count ?? 0
+      total_lessons_completed: Number(totalLessonsCompleted?.count ?? 0),
+      total_vocabulary_learned: Number(totalVocabularyLearned?.count ?? 0)
     };
   }
 
@@ -332,16 +422,18 @@ async function bootstrap() {
     }
 
     try {
-      const result = await db.run(
-        "INSERT INTO users (name, email, password, created_at, level) VALUES (?, ?, ?, ?, ?)",
+      const result = await runQuery(
+        "INSERT INTO users (name, email, password, created_at, level) VALUES ($1, $2, $3, $4, $5) RETURNING id",
         [name, email, hashPassword(password), createdAt, "Beginner"]
       );
 
-      return res.json({ userId: result.lastID });
+      await ensureUserLessonsInitialized(db, result.lastID);
+
+      return res.status(201).json({ userId: result.lastID });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Signup failed.";
 
-      if (message.includes("UNIQUE")) {
+      if (isUniqueConstraintError(error)) {
         return res.status(409).json({ error: "An account with this email already exists." });
       }
 
@@ -358,11 +450,13 @@ async function bootstrap() {
     }
 
     try {
-      const user = await db.get<{ id: number; password: string | null }>("SELECT id, password FROM users WHERE email = ?", [email]);
+      const user = await queryOne<{ id: number; password: string | null }>("SELECT id, password FROM users WHERE email = $1", [email]);
 
       if (!user?.password || !verifyPassword(password, user.password)) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
+
+      await ensureUserLessonsInitialized(db, user.id);
 
       return res.json({ userId: user.id });
     } catch (error) {
@@ -380,8 +474,9 @@ async function bootstrap() {
     }
 
     try {
-      const result = await db.run("INSERT INTO users (name, level, created_at) VALUES (?, ?, ?)", [name, "Beginner", createdAt]);
-      return res.json({ userId: result.lastID });
+      const result = await runQuery("INSERT INTO users (name, level, created_at) VALUES ($1, $2, $3) RETURNING id", [name, "Beginner", createdAt]);
+      await ensureUserLessonsInitialized(db, result.lastID);
+      return res.status(201).json({ userId: result.lastID });
     } catch (error) {
       const message = error instanceof Error ? error.message : "User creation failed.";
       return res.status(500).json({ error: message });
@@ -392,6 +487,26 @@ async function bootstrap() {
     return res.json(lessons);
   });
 
+  app.get("/lessons/:userId", async (req, res) => {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ error: "User ID must be a positive integer." });
+    }
+
+    if (!(await requireExistingUser(userId, res))) {
+      return;
+    }
+
+    try {
+      const lessonRows = await getLessonsForUser(db, userId);
+      return res.json(lessonRows);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "User lessons could not be loaded.";
+      return res.status(500).json({ error: message });
+    }
+  });
+
   app.get("/lesson-progress/:userId", async (req, res) => {
     const userId = Number(req.params.userId);
 
@@ -399,11 +514,15 @@ async function bootstrap() {
       return res.status(400).json({ error: "User ID must be a positive integer." });
     }
 
+    if (!(await requireExistingUser(userId, res))) {
+      return;
+    }
+
     try {
-      const progressRows = await db.all<{ lesson: string; score: number | null; completed_at: string | null }[]>(
+      const progressRows = await queryAll<{ lesson: string; score: number | null; completed_at: string | null }[]>(
         `SELECT lesson, score, completed_at
          FROM progress
-         WHERE user_id = ?`,
+         WHERE user_id = $1`,
         [userId]
       );
 
@@ -418,49 +537,43 @@ async function bootstrap() {
     const userId = parsePositiveInteger(req.body?.userId);
     const lessonId = parsePositiveInteger(req.body?.lessonId);
     const lessonScore = parseNonNegativeInteger(req.body?.score) ?? 100;
-    const completedAt = new Date().toISOString();
 
     if (!userId || !lessonId) {
       return res.status(400).json({ error: "User ID and lesson ID must be positive integers." });
     }
 
-    try {
-      const existingProgress = await db.get<{ id: number }>(
-        "SELECT id FROM progress WHERE user_id = ? AND lesson = ? ORDER BY id DESC LIMIT 1",
-        [userId, String(lessonId)]
-      );
+    if (!(await requireExistingUser(userId, res))) {
+      return;
+    }
 
-      if (existingProgress) {
-        await db.run(
-          `UPDATE progress
-           SET score = MAX(COALESCE(score, 0), ?),
-               completed_at = COALESCE(completed_at, ?)
-           WHERE id = ?`,
-          [lessonScore, completedAt, existingProgress.id]
-        );
-        const currentStreak = await syncUserStreak(userId);
+    if (!requireExistingLesson(lessonId, res)) {
+      return;
+    }
+
+    try {
+      const savedProgress = await saveLessonProgress(db, userId, lessonId, lessonScore);
+
+      if (savedProgress.justCompleted) {
+        const progressUpdate = await incrementDailyProgress(userId, { lessons: 1 });
 
         return res.json({
           success: true,
-          alreadyCompleted: true,
-          currentStreak
+          alreadyCompleted: false,
+          currentStreak: progressUpdate.currentStreak,
+          lessonsCompletedToday: progressUpdate.counts.lessons,
+          nextLessonId: savedProgress.nextLessonId,
+          nextLessonUnlocked: savedProgress.nextLessonUnlocked
         });
       }
 
-      await db.run("INSERT INTO progress (user_id, lesson, score, completed_at) VALUES (?, ?, ?, ?)", [
-        userId,
-        String(lessonId),
-        lessonScore,
-        completedAt
-      ]);
-
-      const progressUpdate = await incrementDailyProgress(userId, { lessons: 1 });
+      const currentStreak = await syncUserStreak(userId);
 
       return res.json({
         success: true,
-        alreadyCompleted: false,
-        currentStreak: progressUpdate.currentStreak,
-        lessonsCompletedToday: progressUpdate.counts.lessons
+        alreadyCompleted: savedProgress.alreadyCompleted,
+        currentStreak,
+        nextLessonId: savedProgress.nextLessonId,
+        nextLessonUnlocked: savedProgress.nextLessonUnlocked
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Lesson progress could not be saved.";
@@ -470,12 +583,12 @@ async function bootstrap() {
 
   app.get("/vocabulary", async (_req, res) => {
     try {
-      const words = await db.all<{
+      const words = await queryAll<{
         id: number;
         word: string;
         meaning: string;
         example: string;
-      }[]>("SELECT * FROM vocabulary LIMIT 5");
+      }[]>("SELECT id, word, meaning, example FROM vocabulary ORDER BY id");
 
       return res.json(words);
     } catch (error) {
@@ -494,15 +607,23 @@ async function bootstrap() {
       return res.status(400).json({ error: "User ID and word ID must be positive integers." });
     }
 
+    if (!(await requireExistingUser(userId, res))) {
+      return;
+    }
+
+    if (!(await requireExistingVocabularyWord(wordId, res))) {
+      return;
+    }
+
     try {
-      const existingProgress = await db.get<{ id: number; correct_count: number; last_seen: string | null }>(
-        "SELECT id, correct_count, last_seen FROM vocabulary_progress WHERE user_id = ? AND word_id = ? ORDER BY id DESC LIMIT 1",
+      const existingProgress = await queryOne<{ id: number; correct_count: number; last_seen: string | null }>(
+        "SELECT id, correct_count, last_seen FROM vocabulary_progress WHERE user_id = $1 AND word_id = $2 ORDER BY id DESC LIMIT 1",
         [userId, wordId]
       );
 
       if (existingProgress) {
-        await db.run(
-          "UPDATE vocabulary_progress SET last_seen = ?, correct_count = correct_count + 1 WHERE id = ?",
+        await runQuery(
+          "UPDATE vocabulary_progress SET last_seen = $1, correct_count = correct_count + 1 WHERE id = $2",
           [todayIso, existingProgress.id]
         );
 
@@ -519,8 +640,8 @@ async function bootstrap() {
         return res.json({ success: true, correctCount: existingProgress.correct_count + 1 });
       }
 
-      await db.run(
-        "INSERT INTO vocabulary_progress (user_id, word_id, last_seen, correct_count) VALUES (?, ?, ?, 1)",
+      await runQuery(
+        "INSERT INTO vocabulary_progress (user_id, word_id, last_seen, correct_count) VALUES ($1, $2, $3, 1)",
         [userId, wordId, todayIso]
       );
 
@@ -550,6 +671,10 @@ async function bootstrap() {
 
     if (sentences === null || words === null || lessonCount === null) {
       return res.status(400).json({ error: "Sentences, words, and lessons must be non-negative integers." });
+    }
+
+    if (!(await requireExistingUser(userId, res))) {
+      return;
     }
 
     try {
@@ -588,6 +713,10 @@ async function bootstrap() {
       return res.status(400).json({ error: "User ID must be a positive integer." });
     }
 
+    if (!(await requireExistingUser(userId, res))) {
+      return;
+    }
+
     try {
       const summary = await getDashboardSummary(userId);
       return res.json(summary);
@@ -614,8 +743,35 @@ async function bootstrap() {
   app.post("/chat", handleConversation);
   app.use("/api", apiRouter);
 
-  app.listen(PORT, () => {
+  app.use((_req, res) => {
+    res.status(404).json({ error: "Route not found." });
+  });
+
+  const errorHandler: express.ErrorRequestHandler = (error, _req, res, _next) => {
+    if (isJsonSyntaxError(error)) {
+      res.status(400).json({ error: "Invalid JSON payload." });
+      return;
+    }
+
+    const message = error instanceof Error ? error.message : "Internal server error.";
+    console.error(message);
+    res.status(500).json({ error: "Internal server error." });
+  };
+
+  app.use(errorHandler);
+
+  const server = app.listen(PORT, () => {
     console.log(`Bolo English API listening on port ${PORT}`);
+  });
+
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    const message =
+      error.code === "EADDRINUSE"
+        ? `Port ${PORT} is already in use. Stop the existing process or choose a different PORT.`
+        : error.message;
+
+    console.error(`Bolo English API failed to start: ${message}`);
+    process.exit(1);
   });
 }
 
@@ -624,3 +780,5 @@ void bootstrap().catch((error) => {
   console.error(message);
   process.exit(1);
 });
+
+

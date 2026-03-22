@@ -23,7 +23,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.11.6",
-    "@types/sqlite3": "^3.1.11",
     "typescript": "^5.9.3"
   }
 }
