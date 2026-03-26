@@ -1,0 +1,24 @@
+{
+  "course_id": "bolo-english-complete-system",
+  "version": "2026-03-24",
+  "phases": {
+    "phase_1": {
+      "file": "curriculum-phase-1-course-structure.json",
+      "description": "Full course structure with all levels, chapters, and lesson titles."
+    },
+    "phase_2": {
+      "file": "curriculum-phase-2-level-1-lessons.json",
+      "description": "Complete beginner level lessons with all required lesson fields."
+    },
+    "phase_3": {
+      "file": "curriculum-phase-3-complete-course.json",
+      "description": "Complete four-level curriculum with all 200 lessons."
+    }
+  },
+  "api_endpoints": [
+    "/api/curriculum/structure",
+    "/api/curriculum/levels",
+    "/api/curriculum/levels/:levelId",
+    "/api/curriculum/lessons/:lessonId"
+  ]
+}

@@ -1,39 +1,33 @@
-﻿export const lessons = [
-  {
-    id: 1,
-    title: "Daily Introduction",
-    level: "beginner",
-    durationMinutes: 15,
-    focus: "Simple self-introduction and greeting flow",
-    hindiSummary: "Apna parichay dena, naam batana, aur basic greeting ko natural tarike se bolna."
-  },
-  {
-    id: 2,
-    title: "Workplace English",
-    level: "intermediate",
-    durationMinutes: 20,
-    focus: "Meetings, updates, and asking for clarification",
-    hindiSummary: "Office meetings mein update dena aur doubt clear karne ke liye useful English."
-  },
-  {
-    id: 3,
-    title: "Client Presentation",
-    level: "advanced",
-    durationMinutes: 30,
-    focus: "Structured pitch, confidence, and business vocabulary",
-    hindiSummary: "Professional presentation ke liye structured speaking aur impact language."
-  },
-  {
-    id: 4,
-    title: "Leadership Communication",
-    level: "professional",
-    durationMinutes: 35,
-    focus: "Negotiation, persuasion, and executive tone",
-    hindiSummary: "Senior-level communication ke liye persuasive aur polished English speaking."
-  }
-] as const;
+import type { CefrLevel, Lesson, VocabularyCategory, VocabularyTerm } from "./content-builders";
+import { foundationLessons } from "./lessons-a0-a1";
+import { a2Lessons } from "./lessons-a2";
+import { b1Lessons } from "./lessons-b1";
+import { advancedLessons } from "./lessons-b2-c1";
+import { foundationVocabularyTerms } from "./vocabulary-foundation";
+import { advancedVocabularyTerms } from "./vocabulary-advanced";
 
-export const grammarTopics = [
+export type { CefrLevel, Lesson, VocabularyCategory, VocabularyTerm } from "./content-builders";
+
+export type GrammarTopic = {
+  id: number;
+  englishTitle: string;
+  hindiTitle: string;
+  explanation: string;
+  example: string;
+  level: "beginner" | "intermediate" | "advanced" | "professional";
+};
+
+export type Scenario = {
+  id: number;
+  title: string;
+  context: string;
+  difficulty: "beginner" | "intermediate" | "advanced" | "professional";
+  targetOutcome: string;
+};
+
+export const lessons: Lesson[] = [...foundationLessons, ...a2Lessons, ...b1Lessons, ...advancedLessons];
+
+export const grammarTopics: GrammarTopic[] = [
   {
     id: 1,
     englishTitle: "Simple Present",
@@ -66,60 +60,11 @@ export const grammarTopics = [
     example: "Therefore, we recommend a phased rollout. / Isliye hum phase-wise rollout suggest karte hain.",
     level: "professional"
   }
-] as const;
+];
 
-export const vocabularyTerms = [
-  {
-    id: 1,
-    english: "Schedule",
-    hindi: "Samay-sarani / plan",
-    category: "Work",
-    usage: "I will share the project schedule by evening.",
-    level: "intermediate"
-  },
-  {
-    id: 2,
-    english: "Confident",
-    hindi: "Atmavishvas se bhara hua",
-    category: "Personality",
-    usage: "You sound more confident when you speak slowly.",
-    level: "beginner"
-  },
-  {
-    id: 3,
-    english: "Negotiate",
-    hindi: "Baat-cheet karke samjhauta karna",
-    category: "Business",
-    usage: "We need to negotiate the final price with the client.",
-    level: "advanced"
-  },
-  {
-    id: 4,
-    english: "Outcome",
-    hindi: "Parinam",
-    category: "Meetings",
-    usage: "Let us focus on the expected outcome of this call.",
-    level: "professional"
-  },
-  {
-    id: 5,
-    english: "Clarify",
-    hindi: "Spasht karna",
-    category: "Communication",
-    usage: "Could you clarify the second point once more?",
-    level: "intermediate"
-  },
-  {
-    id: 6,
-    english: "Deadline",
-    hindi: "Antim tareekh",
-    category: "Work",
-    usage: "We must finish this report before the deadline.",
-    level: "beginner"
-  }
-] as const;
+export const vocabularyTerms: VocabularyTerm[] = [...foundationVocabularyTerms, ...advancedVocabularyTerms];
 
-export const scenarios = [
+export const scenarios: Scenario[] = [
   {
     id: 1,
     title: "Restaurant Visit",
@@ -141,4 +86,4 @@ export const scenarios = [
     difficulty: "professional",
     targetOutcome: "Maintain calm, clarity, and authority in spoken English."
   }
-] as const;
+];

@@ -1,40 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scenarios = exports.vocabularyTerms = exports.grammarTopics = exports.lessons = void 0;
-exports.lessons = [
-    {
-        id: 1,
-        title: "Daily Introduction",
-        level: "beginner",
-        durationMinutes: 15,
-        focus: "Simple self-introduction and greeting flow",
-        hindiSummary: "Apna parichay dena, naam batana, aur basic greeting ko natural tarike se bolna."
-    },
-    {
-        id: 2,
-        title: "Workplace English",
-        level: "intermediate",
-        durationMinutes: 20,
-        focus: "Meetings, updates, and asking for clarification",
-        hindiSummary: "Office meetings mein update dena aur doubt clear karne ke liye useful English."
-    },
-    {
-        id: 3,
-        title: "Client Presentation",
-        level: "advanced",
-        durationMinutes: 30,
-        focus: "Structured pitch, confidence, and business vocabulary",
-        hindiSummary: "Professional presentation ke liye structured speaking aur impact language."
-    },
-    {
-        id: 4,
-        title: "Leadership Communication",
-        level: "professional",
-        durationMinutes: 35,
-        focus: "Negotiation, persuasion, and executive tone",
-        hindiSummary: "Senior-level communication ke liye persuasive aur polished English speaking."
-    }
-];
+const lessons_a0_a1_1 = require("./lessons-a0-a1");
+const lessons_a2_1 = require("./lessons-a2");
+const lessons_b1_1 = require("./lessons-b1");
+const lessons_b2_c1_1 = require("./lessons-b2-c1");
+const vocabulary_foundation_1 = require("./vocabulary-foundation");
+const vocabulary_advanced_1 = require("./vocabulary-advanced");
+exports.lessons = [...lessons_a0_a1_1.foundationLessons, ...lessons_a2_1.a2Lessons, ...lessons_b1_1.b1Lessons, ...lessons_b2_c1_1.advancedLessons];
 exports.grammarTopics = [
     {
         id: 1,
@@ -69,56 +42,7 @@ exports.grammarTopics = [
         level: "professional"
     }
 ];
-exports.vocabularyTerms = [
-    {
-        id: 1,
-        english: "Schedule",
-        hindi: "Samay-sarani / plan",
-        category: "Work",
-        usage: "I will share the project schedule by evening.",
-        level: "intermediate"
-    },
-    {
-        id: 2,
-        english: "Confident",
-        hindi: "Atmavishvas se bhara hua",
-        category: "Personality",
-        usage: "You sound more confident when you speak slowly.",
-        level: "beginner"
-    },
-    {
-        id: 3,
-        english: "Negotiate",
-        hindi: "Baat-cheet karke samjhauta karna",
-        category: "Business",
-        usage: "We need to negotiate the final price with the client.",
-        level: "advanced"
-    },
-    {
-        id: 4,
-        english: "Outcome",
-        hindi: "Parinam",
-        category: "Meetings",
-        usage: "Let us focus on the expected outcome of this call.",
-        level: "professional"
-    },
-    {
-        id: 5,
-        english: "Clarify",
-        hindi: "Spasht karna",
-        category: "Communication",
-        usage: "Could you clarify the second point once more?",
-        level: "intermediate"
-    },
-    {
-        id: 6,
-        english: "Deadline",
-        hindi: "Antim tareekh",
-        category: "Work",
-        usage: "We must finish this report before the deadline.",
-        level: "beginner"
-    }
-];
+exports.vocabularyTerms = [...vocabulary_foundation_1.foundationVocabularyTerms, ...vocabulary_advanced_1.advancedVocabularyTerms];
 exports.scenarios = [
     {
         id: 1,

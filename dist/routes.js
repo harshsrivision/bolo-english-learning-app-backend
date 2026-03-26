@@ -6,7 +6,9 @@ const zod_1 = require("zod");
 const ai_1 = require("./ai");
 const data_1 = require("./data");
 const pronunciation_1 = require("./pronunciation");
+const curriculum_routes_1 = require("./curriculum-routes");
 exports.apiRouter = (0, express_1.Router)();
+exports.apiRouter.use("/curriculum", curriculum_routes_1.curriculumRouter);
 function getWordCount(text) {
     return text
         .trim()
@@ -88,17 +90,23 @@ exports.apiRouter.get("/health", (_req, res) => {
 });
 exports.apiRouter.get("/lessons", (req, res) => {
     const level = req.query.level?.toString();
-    const data = level ? data_1.lessons.filter((lesson) => lesson.level === level) : data_1.lessons;
-    res.json(data);
+    const data = level ? data_1.lessons.filter((lesson) => lesson.cefrLevel === level) : data_1.lessons;
+    res.json(data.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        cefrLevel: lesson.cefrLevel,
+        durationMinutes: lesson.durationMinutes,
+        focus: lesson.focus,
+        hindiSummary: lesson.hindiSummary,
+        unlockRequirement: lesson.unlockRequirement
+    })));
 });
 exports.apiRouter.get("/grammar-topics", (_req, res) => {
     res.json(data_1.grammarTopics);
 });
 exports.apiRouter.get("/vocabulary", (req, res) => {
     const category = req.query.category?.toString();
-    const data = category
-        ? data_1.vocabularyTerms.filter((term) => term.category.toLowerCase() === category.toLowerCase())
-        : data_1.vocabularyTerms;
+    const data = category ? data_1.vocabularyTerms.filter((term) => term.category.toLowerCase() === category.toLowerCase()) : data_1.vocabularyTerms;
     res.json(data);
 });
 exports.apiRouter.get("/conversations/scenarios", (_req, res) => {

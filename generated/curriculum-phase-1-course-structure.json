@@ -1,0 +1,1298 @@
+{
+  "course_id": "bolo-english-complete-system",
+  "version": "2026-03-24",
+  "title": "Bolo English Complete Learning System",
+  "outcome": "A full journey from zero English to advanced, confident, professional English communication.",
+  "systems": {
+    "grammar_system": {
+      "design_principles": [
+        "Grammar appears in practical speaking situations before it is named explicitly.",
+        "Each grammar topic returns in later lessons through conversation, writing, and quiz tasks.",
+        "Learners move from controlled patterns to freer communication at every level."
+      ],
+      "coverage": [
+        "parts of speech",
+        "sentence structure",
+        "simple present, present continuous, simple past, past continuous, past perfect",
+        "future forms with will and going to",
+        "present perfect and present perfect continuous",
+        "articles and quantifiers",
+        "prepositions and direction language",
+        "comparatives and superlatives",
+        "modals for ability, permission, advice, obligation, certainty, speculation",
+        "conditionals from basic to advanced",
+        "active and passive voice",
+        "direct and indirect speech",
+        "relative clauses, noun clauses, gerunds, infinitives",
+        "complex sentence connectors",
+        "formal and professional English usage"
+      ]
+    },
+    "vocabulary_system": {
+      "target_exposures": 2000,
+      "categories": [
+        "Daily life",
+        "Business",
+        "Travel",
+        "Emotions",
+        "Work",
+        "Social",
+        "Health",
+        "Technology",
+        "Leadership",
+        "Community"
+      ],
+      "approach": "Each lesson introduces 10 structured words or phrases, mixes them with review items, and ties them to one communicative task.",
+      "revision_cycles": [
+        "same lesson review",
+        "next lesson retrieval",
+        "end-of-chapter recap",
+        "end-of-level spiral review",
+        "30-day spaced recall"
+      ],
+      "spaced_repetition_days": [
+        1,
+        3,
+        7,
+        14,
+        30
+      ]
+    },
+    "speaking_system": {
+      "daily_speaking_prompt_model": "Every lesson includes one focused speaking task, one role-play context, one confidence instruction, and one think-in-English drill.",
+      "role_play_ladders": [
+        "guided repetition",
+        "supported role-play",
+        "personalized response",
+        "timed fluency response",
+        "real-world simulation"
+      ],
+      "confidence_builders": [
+        "chunk speaking instead of word-by-word translation",
+        "content before perfection",
+        "repeat with one improvement",
+        "speak with pauses, not panic",
+        "finish the thought before self-correcting"
+      ]
+    },
+    "progression_system": {
+      "unlock_logic": {
+        "first_lesson_unlocked_by_default": true,
+        "next_lesson_unlocks_after_completion": true,
+        "next_chapter_unlocks_after_all_chapter_lessons_completed": true,
+        "next_level_unlocks_after_previous_level_completed": true
+      },
+      "mastery_rules": [
+        "Mark lesson complete after speaking task, writing task, and quiz are submitted.",
+        "Recommend review when quiz score is below 70%.",
+        "Promote to the next level after 80% lesson completion plus capstone completion."
+      ]
+    }
+  },
+  "levels": [
+    {
+      "level": 1,
+      "slug": "beginner",
+      "title": "Beginner",
+      "cefr_band": "A0-A1",
+      "outcome": "Start from zero, understand basic classroom English, and handle short real-life interactions with support.",
+      "chapter_count": 5,
+      "lesson_count": 50,
+      "chapters": [
+        {
+          "chapter_id": "L1-C1",
+          "order_index": 1,
+          "title": "Sound, Survival English, and First Sentences",
+          "summary": "Decode English sounds, survive basic interactions, and build first sentence patterns.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L1-C1-L01",
+              "order_index": 1,
+              "title": "Letters, Sounds, and Your First English Words"
+            },
+            {
+              "lesson_id": "L1-C1-L02",
+              "order_index": 2,
+              "title": "Hello, Please, Sorry, Thank You"
+            },
+            {
+              "lesson_id": "L1-C1-L03",
+              "order_index": 3,
+              "title": "Numbers, Colors, and Classroom Objects"
+            },
+            {
+              "lesson_id": "L1-C1-L04",
+              "order_index": 4,
+              "title": "My Name, My City, My Country"
+            },
+            {
+              "lesson_id": "L1-C1-L05",
+              "order_index": 5,
+              "title": "This, That, These, and Those"
+            },
+            {
+              "lesson_id": "L1-C1-L06",
+              "order_index": 6,
+              "title": "Follow Simple Instructions in English"
+            },
+            {
+              "lesson_id": "L1-C1-L07",
+              "order_index": 7,
+              "title": "Meet My Family"
+            },
+            {
+              "lesson_id": "L1-C1-L08",
+              "order_index": 8,
+              "title": "Everyday Actions: Eat, Go, Come, Do"
+            },
+            {
+              "lesson_id": "L1-C1-L09",
+              "order_index": 9,
+              "title": "Yes/No Questions and Short Answers"
+            },
+            {
+              "lesson_id": "L1-C1-L10",
+              "order_index": 10,
+              "title": "My First Two-Minute Self-Introduction"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L1-C2",
+          "order_index": 2,
+          "title": "Home, Family, and Daily Routine",
+          "summary": "Speak about home life, family relationships, and everyday routines in connected sentences.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L1-C2-L01",
+              "order_index": 1,
+              "title": "Rooms and Things at Home"
+            },
+            {
+              "lesson_id": "L1-C2-L02",
+              "order_index": 2,
+              "title": "My Family and Our Roles"
+            },
+            {
+              "lesson_id": "L1-C2-L03",
+              "order_index": 3,
+              "title": "My Daily Routine"
+            },
+            {
+              "lesson_id": "L1-C2-L04",
+              "order_index": 4,
+              "title": "Morning, Afternoon, Evening, Night"
+            },
+            {
+              "lesson_id": "L1-C2-L05",
+              "order_index": 5,
+              "title": "Food, Water, Tea, and the Kitchen"
+            },
+            {
+              "lesson_id": "L1-C2-L06",
+              "order_index": 6,
+              "title": "Likes and Dislikes at Home"
+            },
+            {
+              "lesson_id": "L1-C2-L07",
+              "order_index": 7,
+              "title": "Always, Usually, Sometimes, Never"
+            },
+            {
+              "lesson_id": "L1-C2-L08",
+              "order_index": 8,
+              "title": "Chores and Responsibilities"
+            },
+            {
+              "lesson_id": "L1-C2-L09",
+              "order_index": 9,
+              "title": "Simple Questions at Home"
+            },
+            {
+              "lesson_id": "L1-C2-L10",
+              "order_index": 10,
+              "title": "My Day from Morning to Night"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L1-C3",
+          "order_index": 3,
+          "title": "Places, Time, and Moving Around",
+          "summary": "Handle location, time, transport, weather, and travel basics for independent movement.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L1-C3-L01",
+              "order_index": 1,
+              "title": "Places in Town"
+            },
+            {
+              "lesson_id": "L1-C3-L02",
+              "order_index": 2,
+              "title": "Turn Left, Go Straight, Come Back"
+            },
+            {
+              "lesson_id": "L1-C3-L03",
+              "order_index": 3,
+              "title": "What Time Is It?"
+            },
+            {
+              "lesson_id": "L1-C3-L04",
+              "order_index": 4,
+              "title": "Dates, Months, and Birthdays"
+            },
+            {
+              "lesson_id": "L1-C3-L05",
+              "order_index": 5,
+              "title": "By Bus, Auto, Metro, or Cab"
+            },
+            {
+              "lesson_id": "L1-C3-L06",
+              "order_index": 6,
+              "title": "Buying Tickets and Asking the Price"
+            },
+            {
+              "lesson_id": "L1-C3-L07",
+              "order_index": 7,
+              "title": "Weather and Clothes"
+            },
+            {
+              "lesson_id": "L1-C3-L08",
+              "order_index": 8,
+              "title": "Can, Can't, and May I?"
+            },
+            {
+              "lesson_id": "L1-C3-L09",
+              "order_index": 9,
+              "title": "Basic Emergency and Help Language"
+            },
+            {
+              "lesson_id": "L1-C3-L10",
+              "order_index": 10,
+              "title": "Ask for Directions with Confidence"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L1-C4",
+          "order_index": 4,
+          "title": "People, Feelings, and Social Basics",
+          "summary": "Describe people, talk about feelings, and build social comfort in everyday conversations.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L1-C4-L01",
+              "order_index": 1,
+              "title": "Describe People Around You"
+            },
+            {
+              "lesson_id": "L1-C4-L02",
+              "order_index": 2,
+              "title": "Happy, Sad, Tired, Angry"
+            },
+            {
+              "lesson_id": "L1-C4-L03",
+              "order_index": 3,
+              "title": "Talking to Friends and Neighbors"
+            },
+            {
+              "lesson_id": "L1-C4-L04",
+              "order_index": 4,
+              "title": "Invitations and Plans"
+            },
+            {
+              "lesson_id": "L1-C4-L05",
+              "order_index": 5,
+              "title": "What Are You Doing Now?"
+            },
+            {
+              "lesson_id": "L1-C4-L06",
+              "order_index": 6,
+              "title": "Phone Calls and Voice Notes"
+            },
+            {
+              "lesson_id": "L1-C4-L07",
+              "order_index": 7,
+              "title": "Shopping Talk for Daily Use"
+            },
+            {
+              "lesson_id": "L1-C4-L08",
+              "order_index": 8,
+              "title": "Bigger, Smaller, Better, Cheaper"
+            },
+            {
+              "lesson_id": "L1-C4-L09",
+              "order_index": 9,
+              "title": "Apologizing, Thanking, and Responding Warmly"
+            },
+            {
+              "lesson_id": "L1-C4-L10",
+              "order_index": 10,
+              "title": "Small Talk Without Fear"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L1-C5",
+          "order_index": 5,
+          "title": "First Real-World Conversations",
+          "summary": "Apply beginner English to school, work, health, shopping, and future plans in practical dialogs.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L1-C5-L01",
+              "order_index": 1,
+              "title": "At School or in Class"
+            },
+            {
+              "lesson_id": "L1-C5-L02",
+              "order_index": 2,
+              "title": "At Work on Day One"
+            },
+            {
+              "lesson_id": "L1-C5-L03",
+              "order_index": 3,
+              "title": "At a Restaurant"
+            },
+            {
+              "lesson_id": "L1-C5-L04",
+              "order_index": 4,
+              "title": "At a Clinic or Pharmacy"
+            },
+            {
+              "lesson_id": "L1-C5-L05",
+              "order_index": 5,
+              "title": "At a Bank or Service Desk"
+            },
+            {
+              "lesson_id": "L1-C5-L06",
+              "order_index": 6,
+              "title": "At the Market"
+            },
+            {
+              "lesson_id": "L1-C5-L07",
+              "order_index": 7,
+              "title": "What Was It Like Yesterday?"
+            },
+            {
+              "lesson_id": "L1-C5-L08",
+              "order_index": 8,
+              "title": "What Are You Going to Do Next?"
+            },
+            {
+              "lesson_id": "L1-C5-L09",
+              "order_index": 9,
+              "title": "Survival Grammar Review"
+            },
+            {
+              "lesson_id": "L1-C5-L10",
+              "order_index": 10,
+              "title": "My First Confident Real-Life Conversation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "slug": "elementary",
+      "title": "Elementary",
+      "cefr_band": "A1-A2",
+      "outcome": "Move from survival English to connected everyday English for study, travel, work, and social life.",
+      "chapter_count": 5,
+      "lesson_count": 50,
+      "chapters": [
+        {
+          "chapter_id": "L2-C1",
+          "order_index": 1,
+          "title": "Solid Everyday Grammar",
+          "summary": "Stabilize core grammar so common daily sentences feel predictable, accurate, and reusable.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L2-C1-L01",
+              "order_index": 1,
+              "title": "I, You, He, She, We, They"
+            },
+            {
+              "lesson_id": "L2-C1-L02",
+              "order_index": 2,
+              "title": "Regular Past Verbs"
+            },
+            {
+              "lesson_id": "L2-C1-L03",
+              "order_index": 3,
+              "title": "Irregular Past Verbs in Real Speech"
+            },
+            {
+              "lesson_id": "L2-C1-L04",
+              "order_index": 4,
+              "title": "Will for Future Decisions"
+            },
+            {
+              "lesson_id": "L2-C1-L05",
+              "order_index": 5,
+              "title": "Countable and Uncountable Nouns"
+            },
+            {
+              "lesson_id": "L2-C1-L06",
+              "order_index": 6,
+              "title": "A, An, and The in Real Life"
+            },
+            {
+              "lesson_id": "L2-C1-L07",
+              "order_index": 7,
+              "title": "Some, Any, Much, Many"
+            },
+            {
+              "lesson_id": "L2-C1-L08",
+              "order_index": 8,
+              "title": "There Is, There Are, There Was, There Were"
+            },
+            {
+              "lesson_id": "L2-C1-L09",
+              "order_index": 9,
+              "title": "Adjectives and Adverbs"
+            },
+            {
+              "lesson_id": "L2-C1-L10",
+              "order_index": 10,
+              "title": "Daily Routine Grammar Review"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L2-C2",
+          "order_index": 2,
+          "title": "Experiences and Storytelling",
+          "summary": "Move from isolated sentences to short stories about life, memories, and goals.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L2-C2-L01",
+              "order_index": 1,
+              "title": "My First Important Memory"
+            },
+            {
+              "lesson_id": "L2-C2-L02",
+              "order_index": 2,
+              "title": "First, Then, After That, Finally"
+            },
+            {
+              "lesson_id": "L2-C2-L03",
+              "order_index": 3,
+              "title": "Weekend Stories and Plans"
+            },
+            {
+              "lesson_id": "L2-C2-L04",
+              "order_index": 4,
+              "title": "Talk About Places You Have Visited"
+            },
+            {
+              "lesson_id": "L2-C2-L05",
+              "order_index": 5,
+              "title": "Present Perfect for Life Experience"
+            },
+            {
+              "lesson_id": "L2-C2-L06",
+              "order_index": 6,
+              "title": "Ever, Never, Already, Yet"
+            },
+            {
+              "lesson_id": "L2-C2-L07",
+              "order_index": 7,
+              "title": "Because, So, and That's Why"
+            },
+            {
+              "lesson_id": "L2-C2-L08",
+              "order_index": 8,
+              "title": "Preferences and Suggestions"
+            },
+            {
+              "lesson_id": "L2-C2-L09",
+              "order_index": 9,
+              "title": "Goals, Dreams, and Small Ambitions"
+            },
+            {
+              "lesson_id": "L2-C2-L10",
+              "order_index": 10,
+              "title": "Tell a Short Life Story"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L2-C3",
+          "order_index": 3,
+          "title": "Travel, Shopping, and Services",
+          "summary": "Build language needed for transport, booking, shopping, complaints, and service recovery.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L2-C3-L01",
+              "order_index": 1,
+              "title": "Book a Room or Seat"
+            },
+            {
+              "lesson_id": "L2-C3-L02",
+              "order_index": 2,
+              "title": "Airport and Station English"
+            },
+            {
+              "lesson_id": "L2-C3-L03",
+              "order_index": 3,
+              "title": "Ask for Help While Traveling"
+            },
+            {
+              "lesson_id": "L2-C3-L04",
+              "order_index": 4,
+              "title": "Shopping for Clothes and Sizes"
+            },
+            {
+              "lesson_id": "L2-C3-L05",
+              "order_index": 5,
+              "title": "Returns, Exchanges, and Refunds"
+            },
+            {
+              "lesson_id": "L2-C3-L06",
+              "order_index": 6,
+              "title": "Making and Changing Appointments"
+            },
+            {
+              "lesson_id": "L2-C3-L07",
+              "order_index": 7,
+              "title": "At the Salon, Clinic, or Repair Shop"
+            },
+            {
+              "lesson_id": "L2-C3-L08",
+              "order_index": 8,
+              "title": "Polite Complaints and Requests"
+            },
+            {
+              "lesson_id": "L2-C3-L09",
+              "order_index": 9,
+              "title": "Compare Travel Options"
+            },
+            {
+              "lesson_id": "L2-C3-L10",
+              "order_index": 10,
+              "title": "Service Conversations with Confidence"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L2-C4",
+          "order_index": 4,
+          "title": "Study, Work, and Digital Life",
+          "summary": "Gain language for study, office work, digital communication, and simple professional updates.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L2-C4-L01",
+              "order_index": 1,
+              "title": "Classroom English for Learners"
+            },
+            {
+              "lesson_id": "L2-C4-L02",
+              "order_index": 2,
+              "title": "Office Objects and Routines"
+            },
+            {
+              "lesson_id": "L2-C4-L03",
+              "order_index": 3,
+              "title": "Emails and Chat Basics"
+            },
+            {
+              "lesson_id": "L2-C4-L04",
+              "order_index": 4,
+              "title": "Asking for Clarification"
+            },
+            {
+              "lesson_id": "L2-C4-L05",
+              "order_index": 5,
+              "title": "Report a Simple Update"
+            },
+            {
+              "lesson_id": "L2-C4-L06",
+              "order_index": 6,
+              "title": "Meetings: Join, Listen, and Speak Up"
+            },
+            {
+              "lesson_id": "L2-C4-L07",
+              "order_index": 7,
+              "title": "Deadlines and Priorities"
+            },
+            {
+              "lesson_id": "L2-C4-L08",
+              "order_index": 8,
+              "title": "Skills and Strengths"
+            },
+            {
+              "lesson_id": "L2-C4-L09",
+              "order_index": 9,
+              "title": "Job Application Basics"
+            },
+            {
+              "lesson_id": "L2-C4-L10",
+              "order_index": 10,
+              "title": "A Clear Workday Update"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L2-C5",
+          "order_index": 5,
+          "title": "Relationships, Culture, and Community",
+          "summary": "Speak about festivals, manners, community life, hobbies, wellness, and everyday opinions.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L2-C5-L01",
+              "order_index": 1,
+              "title": "Festivals and Celebrations"
+            },
+            {
+              "lesson_id": "L2-C5-L02",
+              "order_index": 2,
+              "title": "Hosting and Visiting Guests"
+            },
+            {
+              "lesson_id": "L2-C5-L03",
+              "order_index": 3,
+              "title": "Compliments and Encouragement"
+            },
+            {
+              "lesson_id": "L2-C5-L04",
+              "order_index": 4,
+              "title": "Rules, Manners, and Respect"
+            },
+            {
+              "lesson_id": "L2-C5-L05",
+              "order_index": 5,
+              "title": "Community and Neighborhood Issues"
+            },
+            {
+              "lesson_id": "L2-C5-L06",
+              "order_index": 6,
+              "title": "Health and Wellness Habits"
+            },
+            {
+              "lesson_id": "L2-C5-L07",
+              "order_index": 7,
+              "title": "Entertainment and Hobbies"
+            },
+            {
+              "lesson_id": "L2-C5-L08",
+              "order_index": 8,
+              "title": "News and Everyday Opinions"
+            },
+            {
+              "lesson_id": "L2-C5-L09",
+              "order_index": 9,
+              "title": "Advice for Friends and Family"
+            },
+            {
+              "lesson_id": "L2-C5-L10",
+              "order_index": 10,
+              "title": "Friendly Conversation Circle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "slug": "intermediate",
+      "title": "Intermediate",
+      "cefr_band": "B1-B2",
+      "outcome": "Speak in connected paragraphs, manage work and social conversations, and use practical grammar with more control.",
+      "chapter_count": 5,
+      "lesson_count": 50,
+      "chapters": [
+        {
+          "chapter_id": "L3-C1",
+          "order_index": 1,
+          "title": "Opinions, Ideas, and Discussion",
+          "summary": "Move into real discussion language: opinions, reasons, examples, comparison, and conditional thinking.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L3-C1-L01",
+              "order_index": 1,
+              "title": "Express Opinions Clearly"
+            },
+            {
+              "lesson_id": "L3-C1-L02",
+              "order_index": 2,
+              "title": "Agree and Disagree Politely"
+            },
+            {
+              "lesson_id": "L3-C1-L03",
+              "order_index": 3,
+              "title": "Give Reasons and Examples"
+            },
+            {
+              "lesson_id": "L3-C1-L04",
+              "order_index": 4,
+              "title": "Compare Choices in Detail"
+            },
+            {
+              "lesson_id": "L3-C1-L05",
+              "order_index": 5,
+              "title": "Possibility and Probability"
+            },
+            {
+              "lesson_id": "L3-C1-L06",
+              "order_index": 6,
+              "title": "If This Happens, Then What?"
+            },
+            {
+              "lesson_id": "L3-C1-L07",
+              "order_index": 7,
+              "title": "Changes, Trends, and Patterns"
+            },
+            {
+              "lesson_id": "L3-C1-L08",
+              "order_index": 8,
+              "title": "Causes and Effects"
+            },
+            {
+              "lesson_id": "L3-C1-L09",
+              "order_index": 9,
+              "title": "Take Your Turn in a Discussion"
+            },
+            {
+              "lesson_id": "L3-C1-L10",
+              "order_index": 10,
+              "title": "Debate a Daily-Life Topic"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L3-C2",
+          "order_index": 2,
+          "title": "Work Communication and Growth",
+          "summary": "Upgrade workplace language for updates, meetings, feedback, negotiation, and career growth.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L3-C2-L01",
+              "order_index": 1,
+              "title": "Project Updates That Sound Clear"
+            },
+            {
+              "lesson_id": "L3-C2-L02",
+              "order_index": 2,
+              "title": "Professional Email Tone"
+            },
+            {
+              "lesson_id": "L3-C2-L03",
+              "order_index": 3,
+              "title": "Follow-Up and Reminder Language"
+            },
+            {
+              "lesson_id": "L3-C2-L04",
+              "order_index": 4,
+              "title": "Meetings and Action Items"
+            },
+            {
+              "lesson_id": "L3-C2-L05",
+              "order_index": 5,
+              "title": "Problem-Solving Conversations"
+            },
+            {
+              "lesson_id": "L3-C2-L06",
+              "order_index": 6,
+              "title": "Feedback and Coaching Language"
+            },
+            {
+              "lesson_id": "L3-C2-L07",
+              "order_index": 7,
+              "title": "Negotiation Basics"
+            },
+            {
+              "lesson_id": "L3-C2-L08",
+              "order_index": 8,
+              "title": "Client Calls and Service Recovery"
+            },
+            {
+              "lesson_id": "L3-C2-L09",
+              "order_index": 9,
+              "title": "Interview Stories with STAR"
+            },
+            {
+              "lesson_id": "L3-C2-L10",
+              "order_index": 10,
+              "title": "Present a Work Idea"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L3-C3",
+          "order_index": 3,
+          "title": "Social Fluency and Real Interaction",
+          "summary": "Sound more natural in friendships, group talk, storytelling, emotional conversations, and awkward moments.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L3-C3-L01",
+              "order_index": 1,
+              "title": "Make Friends More Naturally"
+            },
+            {
+              "lesson_id": "L3-C3-L02",
+              "order_index": 2,
+              "title": "Humor, Tone, and Softening Language"
+            },
+            {
+              "lesson_id": "L3-C3-L03",
+              "order_index": 3,
+              "title": "Handling Awkward Moments"
+            },
+            {
+              "lesson_id": "L3-C3-L04",
+              "order_index": 4,
+              "title": "Group Conversations"
+            },
+            {
+              "lesson_id": "L3-C3-L05",
+              "order_index": 5,
+              "title": "Invitations, Delays, and Plan Changes"
+            },
+            {
+              "lesson_id": "L3-C3-L06",
+              "order_index": 6,
+              "title": "Tell Better Stories with Detail"
+            },
+            {
+              "lesson_id": "L3-C3-L07",
+              "order_index": 7,
+              "title": "Talk About Movies, Books, and Shows"
+            },
+            {
+              "lesson_id": "L3-C3-L08",
+              "order_index": 8,
+              "title": "Emotions with More Nuance"
+            },
+            {
+              "lesson_id": "L3-C3-L09",
+              "order_index": 9,
+              "title": "Relationship Communication"
+            },
+            {
+              "lesson_id": "L3-C3-L10",
+              "order_index": 10,
+              "title": "Speak Naturally in a Group"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L3-C4",
+          "order_index": 4,
+          "title": "Advanced Grammar in Use",
+          "summary": "Use intermediate grammar in real speech instead of memorizing disconnected rules.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L3-C4-L01",
+              "order_index": 1,
+              "title": "Relative Clauses for Better Detail"
+            },
+            {
+              "lesson_id": "L3-C4-L02",
+              "order_index": 2,
+              "title": "Passive Voice in Real Life"
+            },
+            {
+              "lesson_id": "L3-C4-L03",
+              "order_index": 3,
+              "title": "Reported Speech"
+            },
+            {
+              "lesson_id": "L3-C4-L04",
+              "order_index": 4,
+              "title": "Present Perfect Continuous"
+            },
+            {
+              "lesson_id": "L3-C4-L05",
+              "order_index": 5,
+              "title": "Past Continuous and Past Perfect"
+            },
+            {
+              "lesson_id": "L3-C4-L06",
+              "order_index": 6,
+              "title": "Advice, Obligation, and Certainty"
+            },
+            {
+              "lesson_id": "L3-C4-L07",
+              "order_index": 7,
+              "title": "Third Conditional Introduction"
+            },
+            {
+              "lesson_id": "L3-C4-L08",
+              "order_index": 8,
+              "title": "Gerunds and Infinitives"
+            },
+            {
+              "lesson_id": "L3-C4-L09",
+              "order_index": 9,
+              "title": "Complex Sentence Connectors"
+            },
+            {
+              "lesson_id": "L3-C4-L10",
+              "order_index": 10,
+              "title": "Grammar in Real Conversation"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L3-C5",
+          "order_index": 5,
+          "title": "Media, Society, and Problem Solving",
+          "summary": "Use English to discuss current life topics, systems, customer issues, and public questions.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L3-C5-L01",
+              "order_index": 1,
+              "title": "Summarize a News Story"
+            },
+            {
+              "lesson_id": "L3-C5-L02",
+              "order_index": 2,
+              "title": "Social Media and Technology"
+            },
+            {
+              "lesson_id": "L3-C5-L03",
+              "order_index": 3,
+              "title": "Education and Career Choices"
+            },
+            {
+              "lesson_id": "L3-C5-L04",
+              "order_index": 4,
+              "title": "Money, Saving, and Spending"
+            },
+            {
+              "lesson_id": "L3-C5-L05",
+              "order_index": 5,
+              "title": "Environment and Public Issues"
+            },
+            {
+              "lesson_id": "L3-C5-L06",
+              "order_index": 6,
+              "title": "Health Decisions and Habits"
+            },
+            {
+              "lesson_id": "L3-C5-L07",
+              "order_index": 7,
+              "title": "Customer Complaints and Resolutions"
+            },
+            {
+              "lesson_id": "L3-C5-L08",
+              "order_index": 8,
+              "title": "Explain a System or Process"
+            },
+            {
+              "lesson_id": "L3-C5-L09",
+              "order_index": 9,
+              "title": "Formal vs Informal English"
+            },
+            {
+              "lesson_id": "L3-C5-L10",
+              "order_index": 10,
+              "title": "Solve a Real-World Scenario"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "slug": "advanced",
+      "title": "Advanced",
+      "cefr_band": "B2-C1",
+      "outcome": "Speak with authority, nuance, and professional control in leadership, strategy, presentation, and high-pressure settings.",
+      "chapter_count": 5,
+      "lesson_count": 50,
+      "chapters": [
+        {
+          "chapter_id": "L4-C1",
+          "order_index": 1,
+          "title": "Nuanced Grammar and Precision",
+          "summary": "Refine advanced grammar choices to sound sharp, accurate, and intentionally professional.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L4-C1-L01",
+              "order_index": 1,
+              "title": "Advanced Conditionals for Decision Language"
+            },
+            {
+              "lesson_id": "L4-C1-L02",
+              "order_index": 2,
+              "title": "Inversion and Emphasis"
+            },
+            {
+              "lesson_id": "L4-C1-L03",
+              "order_index": 3,
+              "title": "Hedging and Cautious Language"
+            },
+            {
+              "lesson_id": "L4-C1-L04",
+              "order_index": 4,
+              "title": "Advanced Modals and Speculation"
+            },
+            {
+              "lesson_id": "L4-C1-L05",
+              "order_index": 5,
+              "title": "Noun Clauses and Reported Ideas"
+            },
+            {
+              "lesson_id": "L4-C1-L06",
+              "order_index": 6,
+              "title": "Parallel Structure and Clarity"
+            },
+            {
+              "lesson_id": "L4-C1-L07",
+              "order_index": 7,
+              "title": "Concision and Precision"
+            },
+            {
+              "lesson_id": "L4-C1-L08",
+              "order_index": 8,
+              "title": "Tone Shifts by Context"
+            },
+            {
+              "lesson_id": "L4-C1-L09",
+              "order_index": 9,
+              "title": "Idiomatic but Professional English"
+            },
+            {
+              "lesson_id": "L4-C1-L10",
+              "order_index": 10,
+              "title": "Precision Clinic Review"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L4-C2",
+          "order_index": 2,
+          "title": "Leadership and Influence",
+          "summary": "Lead meetings, handle conflict, persuade stakeholders, and communicate as a trusted professional.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L4-C2-L01",
+              "order_index": 1,
+              "title": "Lead a Meeting with Direction"
+            },
+            {
+              "lesson_id": "L4-C2-L02",
+              "order_index": 2,
+              "title": "Persuasion and Stakeholder Buy-In"
+            },
+            {
+              "lesson_id": "L4-C2-L03",
+              "order_index": 3,
+              "title": "Negotiation Under Pressure"
+            },
+            {
+              "lesson_id": "L4-C2-L04",
+              "order_index": 4,
+              "title": "Manage Conflict Diplomatically"
+            },
+            {
+              "lesson_id": "L4-C2-L05",
+              "order_index": 5,
+              "title": "Coaching and Mentoring Language"
+            },
+            {
+              "lesson_id": "L4-C2-L06",
+              "order_index": 6,
+              "title": "Delegation and Accountability"
+            },
+            {
+              "lesson_id": "L4-C2-L07",
+              "order_index": 7,
+              "title": "Performance Reviews"
+            },
+            {
+              "lesson_id": "L4-C2-L08",
+              "order_index": 8,
+              "title": "Decision-Making Communication"
+            },
+            {
+              "lesson_id": "L4-C2-L09",
+              "order_index": 9,
+              "title": "Executive Summaries"
+            },
+            {
+              "lesson_id": "L4-C2-L10",
+              "order_index": 10,
+              "title": "Lead a High-Stakes Conversation"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L4-C3",
+          "order_index": 3,
+          "title": "Presentations, Writing, and Thought Leadership",
+          "summary": "Present ideas, explain data, answer questions, and write clearly for professional impact.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L4-C3-L01",
+              "order_index": 1,
+              "title": "Strong Presentation Openings"
+            },
+            {
+              "lesson_id": "L4-C3-L02",
+              "order_index": 2,
+              "title": "Signposting and Transitions"
+            },
+            {
+              "lesson_id": "L4-C3-L03",
+              "order_index": 3,
+              "title": "Explaining Data and Visuals"
+            },
+            {
+              "lesson_id": "L4-C3-L04",
+              "order_index": 4,
+              "title": "Handling Questions Gracefully"
+            },
+            {
+              "lesson_id": "L4-C3-L05",
+              "order_index": 5,
+              "title": "Storytelling for Business Impact"
+            },
+            {
+              "lesson_id": "L4-C3-L06",
+              "order_index": 6,
+              "title": "Sharp, Clear Email Writing"
+            },
+            {
+              "lesson_id": "L4-C3-L07",
+              "order_index": 7,
+              "title": "Reports and Proposals"
+            },
+            {
+              "lesson_id": "L4-C3-L08",
+              "order_index": 8,
+              "title": "Writing with Clarity and Tone"
+            },
+            {
+              "lesson_id": "L4-C3-L09",
+              "order_index": 9,
+              "title": "Panels, Public Forums, and Thought Leadership"
+            },
+            {
+              "lesson_id": "L4-C3-L10",
+              "order_index": 10,
+              "title": "Deliver a Persuasive Presentation"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L4-C4",
+          "order_index": 4,
+          "title": "Strategy, Culture, and Global Communication",
+          "summary": "Communicate across teams, cultures, and strategic situations with maturity and adaptability.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L4-C4-L01",
+              "order_index": 1,
+              "title": "Cross-Cultural Communication"
+            },
+            {
+              "lesson_id": "L4-C4-L02",
+              "order_index": 2,
+              "title": "Communicating Strategy Simply"
+            },
+            {
+              "lesson_id": "L4-C4-L03",
+              "order_index": 3,
+              "title": "Change Management Language"
+            },
+            {
+              "lesson_id": "L4-C4-L04",
+              "order_index": 4,
+              "title": "Crisis Communication"
+            },
+            {
+              "lesson_id": "L4-C4-L05",
+              "order_index": 5,
+              "title": "Networking with Intention"
+            },
+            {
+              "lesson_id": "L4-C4-L06",
+              "order_index": 6,
+              "title": "Building Trust Remotely"
+            },
+            {
+              "lesson_id": "L4-C4-L07",
+              "order_index": 7,
+              "title": "Discussing Ethics and Values"
+            },
+            {
+              "lesson_id": "L4-C4-L08",
+              "order_index": 8,
+              "title": "Facilitating Brainstorming"
+            },
+            {
+              "lesson_id": "L4-C4-L09",
+              "order_index": 9,
+              "title": "Influencing Without Authority"
+            },
+            {
+              "lesson_id": "L4-C4-L10",
+              "order_index": 10,
+              "title": "Global Professional Fluency"
+            }
+          ]
+        },
+        {
+          "chapter_id": "L4-C5",
+          "order_index": 5,
+          "title": "Mastery and Independent Expression",
+          "summary": "Think in English, explain abstract ideas, and perform under time pressure with control and voice.",
+          "lesson_titles": [
+            {
+              "lesson_id": "L4-C5-L01",
+              "order_index": 1,
+              "title": "Thinking in English"
+            },
+            {
+              "lesson_id": "L4-C5-L02",
+              "order_index": 2,
+              "title": "Explain Abstract Ideas"
+            },
+            {
+              "lesson_id": "L4-C5-L03",
+              "order_index": 3,
+              "title": "Argue a Point with Nuance"
+            },
+            {
+              "lesson_id": "L4-C5-L04",
+              "order_index": 4,
+              "title": "Storytelling with Emotion and Control"
+            },
+            {
+              "lesson_id": "L4-C5-L05",
+              "order_index": 5,
+              "title": "Promotion and Advanced Interview Talk"
+            },
+            {
+              "lesson_id": "L4-C5-L06",
+              "order_index": 6,
+              "title": "Sales and Persuasion Language"
+            },
+            {
+              "lesson_id": "L4-C5-L07",
+              "order_index": 7,
+              "title": "Media Interview Style Answers"
+            },
+            {
+              "lesson_id": "L4-C5-L08",
+              "order_index": 8,
+              "title": "Personal Brand and Professional Identity"
+            },
+            {
+              "lesson_id": "L4-C5-L09",
+              "order_index": 9,
+              "title": "Fluency Under Time Pressure"
+            },
+            {
+              "lesson_id": "L4-C5-L10",
+              "order_index": 10,
+              "title": "Capstone: Professional English Mastery"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6,16 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
+const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const ai_1 = require("./ai");
 const auth_1 = require("./auth");
 const conversation_1 = require("./conversation");
+const data_1 = require("./data");
 const database_1 = require("./database");
 const lesson_progression_1 = require("./lesson-progression");
-const lessons_1 = require("./lessons");
 const pronunciation_1 = require("./pronunciation");
 const routes_1 = require("./routes");
-dotenv_1.default.config({ path: (0, node_path_1.resolve)(process.cwd(), ".env") });
+const curriculum_data_1 = require("./generated/curriculum-data");
+dotenv_1.default.config({ path: [(0, node_path_1.resolve)(process.cwd(), ".env.local"), (0, node_path_1.resolve)(process.cwd(), ".env")] });
 if (!process.env.PORT && process.env.API_PORT) {
     process.env.PORT = process.env.API_PORT;
 }
@@ -48,7 +50,7 @@ function matchesOriginPattern(origin, pattern) {
     try {
         const originUrl = new URL(origin);
         const patternUrl = new URL(pattern.replace("://*.", "://placeholder."));
-        const suffix = patternUrl.hostname.replace(/^placeholder\\./, "");
+        const suffix = patternUrl.hostname.replace(/^placeholder\./, "");
         return originUrl.protocol === patternUrl.protocol && (originUrl.hostname === suffix || originUrl.hostname.endsWith("." + suffix));
     }
     catch {
@@ -92,10 +94,12 @@ function getTodayDateKey() {
     return new Date().toISOString().split("T")[0];
 }
 function parsePositiveInteger(value) {
-    return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : null;
+    const parsed = typeof value === "string" ? Number(value) : value;
+    return typeof parsed === "number" && Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 function parseNonNegativeInteger(value) {
-    return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
+    const parsed = typeof value === "string" ? Number(value) : value;
+    return typeof parsed === "number" && Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
 }
 function isUniqueConstraintError(error) {
     if (!error || typeof error !== "object") {
@@ -114,6 +118,48 @@ function toDayNumber(date) {
         return null;
     }
     return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+}
+function getLessonById(lessonId) {
+    return data_1.lessons.find((lesson) => lesson.id === lessonId) ?? null;
+}
+function getNextLessonId(lessonId) {
+    const lessonIndex = data_1.lessons.findIndex((lesson) => lesson.id === lessonId);
+    return lessonIndex >= 0 ? data_1.lessons[lessonIndex + 1]?.id ?? null : null;
+}
+function getLessonListItem(lesson) {
+    return {
+        id: lesson.id,
+        title: lesson.title,
+        cefrLevel: lesson.cefrLevel,
+        durationMinutes: lesson.durationMinutes,
+        focus: lesson.focus,
+        hindiSummary: lesson.hindiSummary,
+        unlockRequirement: lesson.unlockRequirement
+    };
+}
+function normalizeCurriculumChapterId(chapterId) {
+    if (/^L\d+-C\d+$/i.test(chapterId)) {
+        return chapterId.toUpperCase();
+    }
+    const match = chapterId.match(/^(\d+)-(\d+)$/);
+    if (!match) {
+        return null;
+    }
+    return `L${match[1]}-C${match[2]}`;
+}
+function parseStoredChapterContent(content) {
+    if (content && typeof content === "object") {
+        return content;
+    }
+    if (typeof content === "string") {
+        try {
+            return JSON.parse(content);
+        }
+        catch {
+            return null;
+        }
+    }
+    return null;
 }
 async function handleCorrection(req, res) {
     const sentence = typeof req.body?.sentence === "string" ? req.body.sentence : "";
@@ -183,7 +229,7 @@ async function bootstrap() {
         return false;
     }
     function requireExistingLesson(lessonId, res) {
-        if ((0, lesson_progression_1.lessonExists)(lessonId)) {
+        if (getLessonById(lessonId)) {
             return true;
         }
         res.status(404).json({ error: "Lesson not found." });
@@ -215,13 +261,6 @@ async function bootstrap() {
         else {
             await runQuery("INSERT INTO daily_progress (user_id, date, sentences_spoken, words_learned, lessons_completed) VALUES ($1, $2, $3, $4, $5)", [userId, today, counts.sentences, counts.words, counts.lessons]);
         }
-        return {
-            user_id: userId,
-            date: today,
-            sentences_spoken: counts.sentences,
-            words_learned: counts.words,
-            lessons_completed: counts.lessons
-        };
     }
     async function calculateCurrentStreak(userId) {
         const activityRows = await queryAll(`SELECT DISTINCT date
@@ -269,10 +308,7 @@ async function bootstrap() {
         };
         await persistDailyProgress(userId, nextCounts);
         const currentStreak = await syncUserStreak(userId);
-        return {
-            counts: nextCounts,
-            currentStreak
-        };
+        return { counts: nextCounts, currentStreak };
     }
     async function incrementDailyProgress(userId, delta) {
         const currentProgress = await getTodayDailyProgress(userId);
@@ -283,10 +319,7 @@ async function bootstrap() {
         };
         await persistDailyProgress(userId, nextCounts);
         const currentStreak = await syncUserStreak(userId);
-        return {
-            counts: nextCounts,
-            currentStreak
-        };
+        return { counts: nextCounts, currentStreak };
     }
     async function getDashboardSummary(userId) {
         const todayProgress = await getTodayDailyProgress(userId);
@@ -307,6 +340,88 @@ async function bootstrap() {
             total_vocabulary_learned: Number(totalVocabularyLearned?.count ?? 0)
         };
     }
+    async function ensureLessonUnlock(userId, lessonId) {
+        if (lessonId === 1) {
+            return false;
+        }
+        const existing = await queryOne("SELECT id FROM lesson_unlocks WHERE user_id = $1 AND lesson_id = $2", [userId, lessonId]);
+        if (existing) {
+            return false;
+        }
+        await runQuery("INSERT INTO lesson_unlocks (user_id, lesson_id, unlocked_at) VALUES ($1, $2, $3)", [userId, lessonId, new Date().toISOString()]);
+        return true;
+    }
+    async function getChapterProgressRows(userId) {
+        return queryAll(`SELECT id, lesson_id, chapter_id, score, completed_at
+       FROM chapter_progress
+       WHERE user_id = $1`, [userId]);
+    }
+    function buildChapterProgressMaps(rows) {
+        const completedChapterIdsByLesson = new Map();
+        for (const row of rows) {
+            const lessonId = Number(row.lesson_id);
+            if (!completedChapterIdsByLesson.has(lessonId)) {
+                completedChapterIdsByLesson.set(lessonId, new Set());
+            }
+            completedChapterIdsByLesson.get(lessonId)?.add(row.chapter_id);
+        }
+        return completedChapterIdsByLesson;
+    }
+    async function getUnlockedLessonIdsForUser(userId) {
+        const [unlockRows, chapterRows] = await Promise.all([
+            queryAll("SELECT lesson_id FROM lesson_unlocks WHERE user_id = $1", [userId]),
+            getChapterProgressRows(userId)
+        ]);
+        const completedChapterIdsByLesson = buildChapterProgressMaps(chapterRows);
+        const unlockedIds = new Set([1]);
+        for (const row of unlockRows) {
+            unlockedIds.add(Number(row.lesson_id));
+        }
+        for (const lesson of data_1.lessons) {
+            const completedCount = completedChapterIdsByLesson.get(lesson.id)?.size ?? 0;
+            if (completedCount >= lesson.chapters.length) {
+                unlockedIds.add(lesson.id);
+                const nextLessonId = getNextLessonId(lesson.id);
+                if (nextLessonId !== null) {
+                    unlockedIds.add(nextLessonId);
+                }
+            }
+        }
+        return { unlockedIds, completedChapterIdsByLesson };
+    }
+    async function getLessonChaptersFromDb(lessonId) {
+        return queryAll(`SELECT id, lesson_id, title, hindi_title, type, content, sort_order
+       FROM chapters
+       WHERE lesson_id = $1
+       ORDER BY sort_order ASC`, [lessonId]);
+    }
+    app.get("/seed-curriculum", async (req, res) => {
+        const expectedKey = process.env.SEED_KEY;
+        const providedKey = typeof req.query.key === "string" ? req.query.key : "";
+        if (!expectedKey || providedKey !== expectedKey) {
+            return res.status(403).json({ error: "Forbidden." });
+        }
+        if (db.dialect !== "postgres") {
+            return res.status(503).json({ error: "Seeding requires PostgreSQL." });
+        }
+        const pool = (0, database_1.getPostgresPool)();
+        if (!pool) {
+            return res.status(503).json({ error: "Database is not configured." });
+        }
+        try {
+            const [schemaSql, seedSql] = await Promise.all([
+                (0, promises_1.readFile)((0, node_path_1.resolve)(process.cwd(), "db", "course-curriculum-schema.sql"), "utf8"),
+                (0, promises_1.readFile)((0, node_path_1.resolve)(process.cwd(), "db", "generated", "course-curriculum-seed.sql"), "utf8")
+            ]);
+            await pool.query(schemaSql);
+            await pool.query(seedSql);
+            return res.json({ success: true, message: "Database seeded" });
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : "Database seeding failed.";
+            return res.status(500).json({ error: message });
+        }
+    });
     app.post("/signup", async (req, res) => {
         const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
         const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
@@ -363,10 +478,152 @@ async function bootstrap() {
             return res.status(500).json({ error: message });
         }
     });
-    app.get("/lessons", (_req, res) => {
-        return res.json(lessons_1.lessons);
+    app.get("/lessons", async (req, res) => {
+        const userId = parsePositiveInteger(req.query.userId);
+        if (!req.query.userId || !userId) {
+            return res.json(data_1.lessons.map((lesson) => getLessonListItem(lesson)));
+        }
+        if (!(await requireExistingUser(userId, res))) {
+            return;
+        }
+        try {
+            const { unlockedIds, completedChapterIdsByLesson } = await getUnlockedLessonIdsForUser(userId);
+            return res.json(data_1.lessons.map((lesson) => {
+                const completedChapters = completedChapterIdsByLesson.get(lesson.id)?.size ?? 0;
+                const totalChapters = lesson.chapters.length;
+                const progressPercent = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+                return {
+                    ...getLessonListItem(lesson),
+                    isUnlocked: unlockedIds.has(lesson.id),
+                    completedChapters,
+                    totalChapters,
+                    progressPercent
+                };
+            }));
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : "Lessons could not be loaded.";
+            return res.status(500).json({ error: message });
+        }
     });
-    app.get("/lessons/:userId", async (req, res) => {
+    app.get("/lessons/:lessonId", async (req, res) => {
+        const lessonId = Number(req.params.lessonId);
+        if (!Number.isInteger(lessonId) || lessonId <= 0) {
+            return res.status(400).json({ error: "Lesson ID must be a positive integer." });
+        }
+        const lesson = getLessonById(lessonId);
+        if (!lesson) {
+            return res.status(404).json({ error: "Lesson not found." });
+        }
+        const userId = parsePositiveInteger(req.query.userId);
+        if (req.query.userId && !userId) {
+            return res.status(400).json({ error: "User ID must be a positive integer." });
+        }
+        if (userId && !(await requireExistingUser(userId, res))) {
+            return;
+        }
+        try {
+            const chapterRows = await getLessonChaptersFromDb(lessonId);
+            const lessonChapters = chapterRows.length
+                ? chapterRows.map((row) => ({
+                    id: row.id,
+                    title: row.title,
+                    hindiTitle: row.hindi_title,
+                    type: row.type,
+                    content: parseStoredChapterContent(row.content)
+                }))
+                : lesson.chapters;
+            const completedChapterIds = new Set();
+            if (userId) {
+                const progressRows = await queryAll(`SELECT id, lesson_id, chapter_id, score, completed_at
+           FROM chapter_progress
+           WHERE user_id = $1 AND lesson_id = $2`, [userId, lessonId]);
+                for (const row of progressRows) {
+                    completedChapterIds.add(row.chapter_id);
+                }
+            }
+            return res.json({
+                ...getLessonListItem(lesson),
+                totalChapters: lesson.chapters.length,
+                completedChapters: completedChapterIds.size,
+                chapters: lessonChapters.map((chapter) => ({
+                    ...chapter,
+                    isCompleted: completedChapterIds.has(chapter.id)
+                }))
+            });
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : "Lesson details could not be loaded.";
+            return res.status(500).json({ error: message });
+        }
+    });
+    app.post("/chapter-progress", async (req, res) => {
+        const userId = parsePositiveInteger(req.body?.userId);
+        const lessonId = parsePositiveInteger(req.body?.lessonId);
+        const chapterId = typeof req.body?.chapterId === "string" ? req.body.chapterId.trim() : "";
+        const score = parseNonNegativeInteger(req.body?.score) ?? 100;
+        if (!userId || !lessonId || !chapterId) {
+            return res.status(400).json({ error: "User ID, lesson ID, and chapter ID are required." });
+        }
+        if (!(await requireExistingUser(userId, res))) {
+            return;
+        }
+        const lesson = getLessonById(lessonId);
+        const curriculumLevel = (0, curriculum_data_1.getCurriculumLevel)(lessonId);
+        const normalizedCurriculumChapterId = normalizeCurriculumChapterId(chapterId);
+        const isCurriculumChapter = Boolean(curriculumLevel && normalizedCurriculumChapterId);
+        if (!lesson && !curriculumLevel) {
+            return res.status(404).json({ error: "Lesson not found." });
+        }
+        const chapterExists = isCurriculumChapter
+            ? curriculumLevel?.chapters.some((chapter) => chapter.chapter_id === normalizedCurriculumChapterId)
+            : lesson?.chapters.some((chapter) => chapter.id === chapterId);
+        if (!chapterExists) {
+            return res.status(404).json({ error: "Chapter not found." });
+        }
+        try {
+            const existingProgress = await queryOne(`SELECT id, lesson_id, chapter_id, score, completed_at
+         FROM chapter_progress
+         WHERE user_id = $1 AND chapter_id = $2
+         LIMIT 1`, [userId, chapterId]);
+            const completedAt = existingProgress?.completed_at ?? new Date().toISOString();
+            const nextScore = Math.max(existingProgress?.score ?? 0, score);
+            const wasAlreadyCompleted = Boolean(existingProgress);
+            if (existingProgress) {
+                await runQuery(`UPDATE chapter_progress
+           SET score = $1, completed_at = $2, lesson_id = $3
+           WHERE id = $4`, [nextScore, completedAt, lessonId, existingProgress.id]);
+            }
+            else {
+                await runQuery("INSERT INTO chapter_progress (user_id, lesson_id, chapter_id, completed_at, score) VALUES ($1, $2, $3, $4, $5)", [userId, lessonId, chapterId, completedAt, nextScore]);
+            }
+            const completedRows = await queryAll(`SELECT id, lesson_id, chapter_id, score, completed_at
+         FROM chapter_progress
+         WHERE user_id = $1 AND lesson_id = $2`, [userId, lessonId]);
+            const totalChapterCount = isCurriculumChapter ? curriculumLevel?.chapters.length ?? 0 : lesson?.chapters.length ?? 0;
+            const isLessonCompleted = totalChapterCount > 0 && completedRows.length >= totalChapterCount;
+            let nextLessonUnlocked = false;
+            if (!isCurriculumChapter && lesson) {
+                await ensureLessonUnlock(userId, lessonId);
+                if (isLessonCompleted) {
+                    const nextLessonId = getNextLessonId(lessonId);
+                    if (nextLessonId !== null) {
+                        nextLessonUnlocked = await ensureLessonUnlock(userId, nextLessonId);
+                    }
+                    const savedProgress = await (0, lesson_progression_1.saveLessonProgress)(db, userId, lessonId, 100);
+                    if (savedProgress.justCompleted) {
+                        await incrementDailyProgress(userId, { lessons: 1 });
+                    }
+                }
+            }
+            return res.json({ success: true, nextLessonUnlocked, xpAwarded: wasAlreadyCompleted ? 0 : 50 });
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : "Chapter progress could not be saved.";
+            return res.status(500).json({ error: message });
+        }
+    });
+    app.get("/lesson-unlocks/:userId", async (req, res) => {
         const userId = Number(req.params.userId);
         if (!Number.isInteger(userId) || userId <= 0) {
             return res.status(400).json({ error: "User ID must be a positive integer." });
@@ -375,11 +632,11 @@ async function bootstrap() {
             return;
         }
         try {
-            const lessonRows = await (0, lesson_progression_1.getLessonsForUser)(db, userId);
-            return res.json(lessonRows);
+            const { unlockedIds } = await getUnlockedLessonIdsForUser(userId);
+            return res.json(Array.from(unlockedIds).sort((left, right) => left - right));
         }
         catch (error) {
-            const message = error instanceof Error ? error.message : "User lessons could not be loaded.";
+            const message = error instanceof Error ? error.message : "Lesson unlocks could not be loaded.";
             return res.status(500).json({ error: message });
         }
     });
@@ -442,15 +699,8 @@ async function bootstrap() {
             return res.status(500).json({ error: message });
         }
     });
-    app.get("/vocabulary", async (_req, res) => {
-        try {
-            const words = await queryAll("SELECT id, word, meaning, example FROM vocabulary ORDER BY id");
-            return res.json(words);
-        }
-        catch (error) {
-            const message = error instanceof Error ? error.message : "Vocabulary could not be loaded.";
-            return res.status(500).json({ error: message });
-        }
+    app.get("/vocabulary", (_req, res) => {
+        return res.json(data_1.vocabularyTerms);
     });
     app.post("/vocabulary-progress", async (req, res) => {
         const userId = parsePositiveInteger(req.body?.userId);
@@ -472,21 +722,13 @@ async function bootstrap() {
                 await runQuery("UPDATE vocabulary_progress SET last_seen = $1, correct_count = correct_count + 1 WHERE id = $2", [todayIso, existingProgress.id]);
                 if (!existingProgress.last_seen?.startsWith(todayKey)) {
                     const progressUpdate = await incrementDailyProgress(userId, { words: 1 });
-                    return res.json({
-                        success: true,
-                        correctCount: existingProgress.correct_count + 1,
-                        currentStreak: progressUpdate.currentStreak
-                    });
+                    return res.json({ success: true, correctCount: existingProgress.correct_count + 1, currentStreak: progressUpdate.currentStreak });
                 }
                 return res.json({ success: true, correctCount: existingProgress.correct_count + 1 });
             }
             await runQuery("INSERT INTO vocabulary_progress (user_id, word_id, last_seen, correct_count) VALUES ($1, $2, $3, 1)", [userId, wordId, todayIso]);
             const progressUpdate = await incrementDailyProgress(userId, { words: 1 });
-            return res.json({
-                success: true,
-                correctCount: 1,
-                currentStreak: progressUpdate.currentStreak
-            });
+            return res.json({ success: true, correctCount: 1, currentStreak: progressUpdate.currentStreak });
         }
         catch (error) {
             const message = error instanceof Error ? error.message : "Vocabulary progress could not be saved.";
@@ -510,16 +752,8 @@ async function bootstrap() {
         }
         try {
             const progressUpdate = mode === "increment"
-                ? await incrementDailyProgress(userId, {
-                    sentences,
-                    words,
-                    lessons: lessonCount
-                })
-                : await saveDailyProgressMaximum(userId, {
-                    sentences,
-                    words,
-                    lessons: lessonCount
-                });
+                ? await incrementDailyProgress(userId, { sentences, words, lessons: lessonCount })
+                : await saveDailyProgressMaximum(userId, { sentences, words, lessons: lessonCount });
             return res.json({
                 success: true,
                 currentStreak: progressUpdate.currentStreak,
